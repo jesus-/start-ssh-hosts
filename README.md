@@ -1,6 +1,8 @@
 # start-ssh-hosts
 start several ssh connections from a host file
 
+
+*main_file*
 ```
 #!/bin/bash
 FILE=$1
@@ -60,5 +62,31 @@ do
 	fi
 
 done < $FILE
+
+```
+
+*deploy*
+
+Is a very bad way to inform the password in the file! better to use ssh keys
+```
+#!/usr/bin/expect
+
+if {[llength $argv] == 0} {
+	send_user "Usage: deploy \[ip\]\n"
+	exit 1
+}
+
+spawn ssh -o StrictHostKeyChecking=no deploy@[lindex $argv 0]
+
+expect {
+	"assword:" {
+		send "password\r"
+		
+		expect "$" {
+			send "pm2 ls\r"
+			interact			
+		}
+	}
+}
 
 ```
